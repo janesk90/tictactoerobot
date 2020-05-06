@@ -21,7 +21,7 @@ class AlphaBetaStrat(Strat):
         evals = []
         for m in possibleNextMoves:
             b.putO(*m)
-            v = self.alphaBeta(b, 2, float("-inf"), float("inf"), False) # because the next person will be X, who is min
+            v = self.alphaBeta(b, 8, float("-inf"), float("inf"), False) # because the next person will be X, who is min
             b.undo()
             evals.append({"move": m, "val":v})
         return sorted(evals, key=lambda d: -d['val'])[0]['move']
