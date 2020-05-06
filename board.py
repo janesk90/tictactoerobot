@@ -6,16 +6,21 @@ class Board(object):
     def __init__(self, size=3):
         self.boardArr = []
         self.size = size
+        self.history = []
         for i in range(size):
             self.boardArr.append([EMPTY_SPACE]*size)
     def getBoard(self): # warning this returns the actual board
         return self.boardArr
     def _put(self, row, col, val):
         self.boardArr[row][col] = val # this is on purpose
+        self.history.append((row, col))
     def putX(self, row, col):
         self._put(row, col, X_VALUE)
     def putO(self, row, col):
         self._put(row, col, O_VALUE)
+    def undo(self):
+        position = self.history.pop()
+        self._put(position[0], position[1], EMPTY_SPACE)
     def toString(self):
         s = ""
         for i in self.boardArr:
