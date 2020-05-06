@@ -9,22 +9,6 @@ from pybricks.tools import print, wait, StopWatch
 from pybricks.robotics import DriveBase
 from LineSensor import LineSensor
 
-
-
-    # leftBlackAmbience = calibrateColorSensor(colorSensor = leftColorSensor, position = "center of line")
-    # leftWhiteAmbience = calibrateColorSensor(colorSensor = leftColorSensor, position = "white section")
-    # edgeOfLineAmbience = ((leftBlackAmbience + leftWhiteAmbience) / 2.0)
-    # print("--- line: " + str(leftBlackAmbience))
-    # print("--- white: " + str(leftWhiteAmbience))
-    # print("--- edge: " + str(edgeOfLineAmbience))
-
-# def getEdgeOfLine(leftColorSensor = ColorSensor(Port.S2), rightColorSensor = ColorSensor(Port.S3)): 
-#     print("left edge of line")
-#     leftEdgeOfLineAmbience = calibrateEdgeOfLine(leftColorSensor)
-#     print("right edge of line")
-#     rightEdgeOfLineAmbience = calibrateEdgeOfLine(rightColorSensor)
-#     return[leftEdgeOfLineAmbience, rightEdgeOfLineAmbience]
-
 def getEdgeOfLine(colorSensor, sensorName = ""):
     insideOfLineAmbience = 0
     outsideOfLineAmbience = 0
@@ -67,10 +51,6 @@ def getPositioned():
         wait(100) 
 
 
-# rightModule = initiateLineSensor(motor = Motor(Port.D), colorSensor = ColorSensor(Port.S3), speed = 100)
-
-
-
 # issue - 
 # lineFollowingSensor etc still uses leftSpeed and rightSpeed... 
 # if its going to be truly ready to switch use of motors we need this method to just know
@@ -84,12 +64,12 @@ def inchWorm(lineCrossingModule, lineFollowingModule, direction):
         lineFollowingModule.run(speedFactor = (1/2 * direction))
         lineCrossingModule.run(speedFactor = direction)
     elif lineFollowingModuleAmbience <= lineFollowingModule.getEdgeOfLineAmbience(): # darker
-        # if lineCrossingModuleColor == Color.BLACK:
-        #     print("line cross sees line is black")
-        #     lineCrossingModuleSeesLine = True
-        #     brick.light(Color.RED)
-        #     lineCrossingModule.run(speedFactor = (1/2 * direction))
-        #     lineFollowingModule.run(speedFactor = (1/2 * direction))
+        if lineCrossingModuleColor == Color.BLACK:
+            print("line cross sees line is black")
+            lineCrossingModuleSeesLine = True
+            brick.light(Color.RED)
+            lineCrossingModule.run(speedFactor = (1/2 * direction))
+            lineFollowingModule.run(speedFactor = (1/2 * direction))
         if lineCrossingModuleAmbience < lineCrossingModule.getEdgeOfLineAmbience(): 
             print("line cross sees darker than average")
             lineCrossingModuleSeesLine = True
@@ -101,8 +81,7 @@ def inchWorm(lineCrossingModule, lineFollowingModule, direction):
             lineFollowingModule.run(speedFactor = direction)
     return lineCrossingModuleSeesLine
 
-
-def traverseGrid(lineCrossingModule, lineFollowingModule, linesToCross, direction):
+def moveForward(lineCrossingModule, lineFollowingModule, linesToCross, direction):
     linesCrossed = 0
     lineSpottedCurrent = False
     lineSpotted1Previous = False
@@ -123,7 +102,7 @@ def traverseGrid(lineCrossingModule, lineFollowingModule, linesToCross, directio
 
 # have it back up, then follow the edge of the line
 
-def rightTurn(lineCrossingModule, lineFollowingModule): 
+def turnRight(lineCrossingModule, lineFollowingModule): 
     turnTime = 65
     currTime = 0
     while (currTime < turnTime):
@@ -153,18 +132,44 @@ lineCrossingModule = rightModule
 
 getPositioned()
 
-def rerun():
-    while not any (brick.buttons()):
-        brick.display.text("press a button", (5, 50))
-        brick.display.text("to run again")
-    return True
+# def rerun():
+#     while not any (brick.buttons()):
+#         brick.display.text("press a button", (5, 50))
+#         brick.display.text("to run again")
+#     return True
 
-redo = True
 
-i = 0
-while True: 
-    traverseGrid(lineCrossingModule, lineFollowingModule, linesToCross = 3, direction = 1)
-    rightTurn(lineCrossingModule, lineFollowingModule)
+# while True: 
+#     moveForward(lineCrossingModule, lineFollowingModule, linesToCross = 3, direction = 1)
+#     turnRight(lineCrossingModule, lineFollowingModule)
+
+def navigate(lineCrossingModule, 
+    lineFollowingModule, 
+    currentCoordinates, 
+    destinationCoordinates):
+    print("from " + str(currentCoordinates) + " to " + str(destinationCoordinates))
+    
+    i = 0
+    while currentCoordinates != destinationCoordinates:
+        if currentCoordinates[i] != destinationCoordinates[i]:
+            turnRight(lineCrossingModule, lineFollowingModule)
+            coordDifference = destinationCoordinates[i] - currentCoordinates[i]
+            linesToCross = abs(coordDifference) + 1
+            moveForward(lineCrossingModule, lineFollowingModule, linesToCross, direction = 1)
+            currentCoordinates[i] = currentCoordinates[i] + coordDifference
+            print(str(i))
+        i = (i + 1) % 2
+
+    print("->arrived at " + str(currentCoordinates))
+    return currentCoordinates
+
+initialCoordinates = [0, 0]
+
+currentCoordinates = navigate(lineCrossingModule, lineFollowingModule, currentCoordinates = initialCoordinates, destinationCoordinates = [0,0])
+
+currentCoordinates = navigate(lineCrossingModule, lineFollowingModule, currentCoordinates, destinationCoordinates = [0,2])
+
+currentCoordinates = navigate(lineCrossingModule, lineFollowingModule, currentCoordinates, destinationCoordinates = [2,2])
 
 
 # def backup(lineCrossingModule, lineFollowingModule):
