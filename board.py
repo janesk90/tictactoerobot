@@ -5,10 +5,13 @@ class Board(object):
     boardArr = None
     def __init__(self, size=3):
         self.boardArr = []
+        self.size = size
         for i in range(size):
-            self.boardArr.append([0]*size)
+            self.boardArr.append([EMPTY_SPACE]*size)
+    def getBoard(self): # warning this returns the actual board
+        return self.boardArr
     def _put(self, row, col, val):
-        self.boardArr[col][row] = val # this is on purpose
+        self.boardArr[row][col] = val # this is on purpose
     def putX(self, row, col):
         self._put(row, col, X_VALUE)
     def putO(self, row, col):
@@ -41,6 +44,13 @@ class Board(object):
         if diag2 == [X_VALUE]*len(self.boardArr) or diag2 == [O_VALUE]*len(self.boardArr):
             return True
         return False
+    def isFull(self):
+        count = 0
+        for c in self.boardArr:
+            for r in c:
+                if r != EMPTY_SPACE:
+                    count += 1
+        return count == self.size**2
 """
 b = Board(3)
 b.putX(0,0)
