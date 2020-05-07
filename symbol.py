@@ -26,6 +26,3 @@ def WriteSymbol ():
     left_motor.run_angle(75, 150)
     right_motor.run_angle(75, 180)
     left_motor.run_angle(75, 150)
-    
-Arm ()
-WriteSymbol ()
